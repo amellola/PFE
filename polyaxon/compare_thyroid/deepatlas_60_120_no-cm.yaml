@@ -1,0 +1,75 @@
+---
+version: 1
+
+kind: experiment
+
+framework: pytorch
+
+tags: [deepatlas, wandb, no_cm, thyroid, e60_120]
+
+build:
+  image: pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
+  build_steps:
+    - apt update
+    - apt install gcc python3 python3-pip -y
+    - python3 -m pip install -U --no-cache-dir polyaxon_client
+    - pip install -r requirements.txt
+  env_vars:
+    - ["TORCH_HOME", "/data1/PytorchModelZoo"]
+    - ["CUDA_LAUNCH_BLOCKING", 1]
+
+environment:
+  resources:
+    cpu:
+      requests: 3
+      limits: 3
+    memory:
+      requests: 16384 #8192 #4096 #2048
+      limits: 32768 # 16384 #8192
+    gpu:
+      requests: 1
+      limits: 1
+
+params:
+  batch_size_train: 2 #8
+  batch_size_test: 2 #16
+  epochs: 60
+  lr: 0.001
+  resize: 144 #96 #144
+  size: 380
+  cache_num: 1
+  data_dir: vanessagd/Monai_Projects/Ifssnet/Thyroid_even/imagesTr
+  test_data_dir: vanessagd/Monai_Projects/Ifssnet/Thyroid_even/imagesTs
+  # aux_model_dir: vanessagd/Monai_Projects/Ifssnet/Left/checkpoints/deepatlas_180_cm
+  pretrain: "pretrain-seg"
+  conf_maps: "no-conf-maps"
+  wandb: "wandb" # wandb / no-wandb
+  wandb_key: "ebc2a5f87292a5eb270a5a7cd8fc74355c7cd924"
+  wandb_project: "us_left_v2"
+  # === Train Context ===
+  lambda_a: 2.0
+  lambda_sp: 3.0
+  lambda_r_multiplier: 7.5
+  reg_phase_training_batches_per_epoch: 40
+  seg_phase_training_batches_per_epoch: 5
+  reg_phase_num_validation_batches_to_use: 40
+  val_interval: 5
+
+run:
+  cmd: python3 -u -m deepatlas.main \
+    --polyaxon  \
+    --{{ wandb }} \
+    --wandb-key {{ wandb_key }} \
+    --wandb-project {{ wandb_project }} \
+    train \
+    --batch-size={{ batch_size_train }} \
+    --test-batch-size={{ batch_size_test }} \
+    --epochs={{ epochs }} \
+    --lr={{ lr }} \
+    --resize={{ resize }} \
+    --cache-num={{ cache_num }} \
+    --data-dir={{ data_dir }} \
+    --{{ pretrain }} \
+    --train-context='{"lambda_a":{{ lambda_a }},"lambda_sp":{{ lambda_sp }},"lambda_r_multiplier":{{ lambda_r_multiplier }},"reg_phase_training_batches_per_epoch":{{ reg_phase_training_batches_per_epoch }},"seg_phase_training_batches_per_epoch":{{ seg_phase_training_batches_per_epoch }},"reg_phase_num_validation_batches_to_use":{{ reg_phase_num_validation_batches_to_use }},"val_interval":{{ val_interval }}}' \
+    --{{ conf_maps }} \
+    --size={{ size }}

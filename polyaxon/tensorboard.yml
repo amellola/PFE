@@ -1,0 +1,9 @@
+version: 1
+kind: tensorboard
+environment:
+    node_selector:
+         polyaxon: tensorboards
+build:
+  image: 'tensorflow/tensorflow:1.11.0-py3'
+
+# polyaxon tensorboard -xp <process_id> start -f tensorboard.yml 

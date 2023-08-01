@@ -1,0 +1,107 @@
+.PHONY: run/train run/infer
+## run example command for training
+run/train: venv
+	python3 -m deepatlas.main train \
+    --batch-size=2 \
+    --test-batch-size=2 \
+    --epochs=5 \
+    --lr=0.001 \
+    --resize=96 \
+    --cache-num=2 \
+    --data-dir=datasets/new_us_data/imagesTr \
+    --train-context='{"lambda_a":2.0,"lambda_sp":3.0,"lambda_r_multiplier":7.5,"reg_phase_training_batches_per_epoch":40,"seg_phase_training_batches_per_epoch":5,"reg_phase_num_validation_batches_to_use":40,"val_interval":5}' \
+    # --pretrain-seg
+	# --limit=2 \
+	# --device cpu
+## run example command for training on oasis dataset
+run/train_oasis: venv
+	python3 -m deepatlas.main train \
+    --batch-size=2 \
+    --test-batch-size=2 \
+    --epochs=10 \
+    --lr=0.001 \
+    --resize=96 \
+    --cache-num=2 \
+    --data-dir=datasets/oasis_full \
+    --limit=2 \
+    --train-context='{"lambda_a":2.0,"lambda_sp":3.0,"lambda_r_multiplier":7.5,"reg_phase_training_batches_per_epoch":40,"seg_phase_training_batches_per_epoch":5,"reg_phase_num_validation_batches_to_use":40,"val_interval":5}' \
+    --pretrain-seg \
+	--oasis
+run/train_seg_solo: venv
+	python3 -m deepatlas.main --debug train \
+    --batch-size=2 \
+    --test-batch-size=2 \
+    --epochs=10 \
+    --lr=0.001 \
+    --resize=128 \
+    --cache-num=2 \
+    --data-dir=datasets/cm_loss_test \
+    --limit=2 \
+	--network=unet \
+	--conf-maps \
+	--solo-seg
+run/infer_solo_seg: venv
+	python3 -m deepatlas.main infer \
+	--data-dir datasets/thyroid_even/imagesTs \
+	--resize 128 \
+	--model-dir data/checkpoints \
+	--network=unet \
+	--no-conf-maps \
+	--size 380 \
+	--solo-seg
+## run example command for inference
+run/infer: venv
+	python -m deepatlas.main infer \
+	--data-dir datasets/oasis/imagesTs \
+	--resize 96 \
+	--model-dir data/checkpoints \
+	--metrics \
+	--device cpu
+## run example command for inference with deepatlas
+run/infer_us: venv
+	python -m deepatlas.main infer \
+	--data-dir datasets/DeepAtlas/imagesTs \
+	--resize 128 \
+	--model-dir data/checkpoints
+run/metrics_us: venv
+	python -m deepatlas.main metrics \
+	--gt-dir datasets/DeepAtlas/imagesTs/labels/final \
+	--pred-dir datasets/DeepAtlas/imagesTs/labels/pred \
+	--output-dir ./data/output \
+	--save-ram
+## full run with training and inference
+run/full_run: venv
+	python3 -m deepatlas.main train \
+	--batch-size=2 \
+	--test-batch-size=2 \
+	--epochs=10 \
+	--lr=0.001 \
+	--resize=96 \
+	--cache-num=2 \
+	--data-dir=datasets/oasis/imagesTr \
+	--limit=2 \
+	--train-context='{"lambda_a":2.0,"lambda_sp":3.0,"lambda_r_multiplier":7.5,"reg_phase_training_batches_per_epoch":40,"seg_phase_training_batches_per_epoch":5,"reg_phase_num_validation_batches_to_use":40,"val_interval":5}' \
+	--pretrain-seg \
+	infer \
+	--data-dir datasets/oasis/imagesTs \
+	--resize 96 \
+	--model-dir data/output \
+	--metrics
+## run example command for training and inference on oasis dataset
+run/oasis_full: venv
+	python3 -m deepatlas.main train \
+    --batch-size=2 \
+    --test-batch-size=2 \
+    --epochs=1 \
+    --lr=0.001 \
+    --resize=96 \
+    --cache-num=2 \
+    --data-dir=datasets/oasis_full \
+    --limit=2 \
+    --train-context='{"lambda_a":2.0,"lambda_sp":3.0,"lambda_r_multiplier":7.5,"reg_phase_training_batches_per_epoch":40,"seg_phase_training_batches_per_epoch":5,"reg_phase_num_validation_batches_to_use":40,"val_interval":5}' \
+    --pretrain-seg \
+	--oasis \
+	--device cpu \
+	infer \
+	--metrics \
+	--device cpu

@@ -1,0 +1,47 @@
+---
+version: 1
+
+kind: experiment
+
+framework: pytorch
+
+tags: [unet, new_data, infer, conf_maps]
+
+build:
+  image: pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
+  build_steps:
+    - apt update
+    - apt install gcc python3 python3-pip -y
+    - python3 -m pip install -U --no-cache-dir polyaxon_client
+    - pip install -r requirements.txt
+  env_vars:
+    - ["TORCH_HOME", "/data1/PytorchModelZoo"]
+    - ["CUDA_LAUNCH_BLOCKING", 1]
+
+environment:
+  resources:
+    cpu:
+      requests: 3
+      limits: 3
+    memory:
+      requests: 10240 #8192 #4096 #2048
+      limits: 24576 # 16384 #8192
+    gpu:
+      requests: 1
+      limits: 1
+
+params:
+  resize: 128 #96 #144
+  test_data_dir: vanessagd/Monai_Projects/Ifssnet/Left/imagesTs
+  seg_model: vanessagd/Monai_Projects/Ifssnet/Left/checkpoints/unet-120-new_data.pth
+  network: unet
+
+run:
+  cmd:
+    python3 -u -m deepatlas.main --polyaxon infer \
+    --data-dir {{ test_data_dir }} \
+    --resize={{ resize }} \
+    --seg-model={{ seg_model }} \
+    --solo-seg
+    --network={{ network }}
+    # --metrics

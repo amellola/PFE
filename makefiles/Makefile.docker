@@ -1,0 +1,35 @@
+.PHONY: docker/build docker/up docker/start docker/down docker/destroy docker/stop docker/restart docker/logs docker/ps
+## build containers specified in docker-compose.yaml file (c=<service> to specify just one service)
+docker/build:
+		docker-compose -f docker-compose.yaml build $(c)
+## create and starts containers in the background (c=<service> to specify just one service)
+docker/up:
+		docker-compose -f docker-compose.yaml up -d $(c)
+## start existing containers (c=<service> to specify just one service)
+docker/start:
+		docker-compose -f docker-compose.yaml start $(c)
+## stop containers and removes them (c=<service> to specify just one service)
+docker/down:
+		docker-compose -f docker-compose.yaml down $(c)
+## stop and remove containers as well as volumes (c=<service> to specify just one service)
+docker/destroy:
+		docker-compose -f docker-compose.yaml down -v $(c)
+## just stop running containers (c=<service> to specify just one service)
+docker/stop:
+		docker-compose -f docker-compose.yaml stop $(c)
+## stop, create and restart containers in the background (c=<service> to specify just one service)
+docker/restart:
+		docker-compose -f docker-compose.yaml stop $(c)
+		docker-compose -f docker-compose.yaml up -d $(c)
+## follow container logs (c=<service> to specify just one service)
+docker/logs:
+		docker-compose -f docker-compose.yaml logs --tail=100 -f $(c)
+## show running containers
+docker/ps:
+		docker-compose -f docker-compose.yaml ps
+## run dev-container interactively (needs modified docker-compose file)
+docker/run-dev:
+		docker-compose -f docker-compose.yaml run deepatlas-dev
+## start vpn only (runs on host network - vpn also available on host system)
+docker/run-vpn:
+		docker-compose -f docker-compose.yaml up -d vpn

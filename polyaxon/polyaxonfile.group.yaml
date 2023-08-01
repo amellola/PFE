@@ -1,0 +1,57 @@
+---
+version: 1
+
+kind: group
+
+framework: pytorch
+
+tags: [deepatlas, group-resize]
+
+build:
+  image: pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
+  build_steps:
+    - apt update
+    - apt install gcc -y
+    - python3 -m pip install -U --no-cache-dir polyaxon_client
+    - pip install -r requirements.txt
+  env_vars:
+    - ["TORCH_HOME", "/data1/PytorchModelZoo"]
+    - ["CUDA_LAUNCH_BLOCKING", 1]
+
+environment:
+  resources:
+    cpu:
+      requests: 3
+      limits: 3
+    memory:
+      requests: 8192 #4096 #2048
+      limits: 16384 #8192
+    gpu:
+      requests: 1
+      limits: 1
+
+hptuning:
+  matrix:
+    resize:
+      values: [96, 144]
+
+params:
+  batch_size_train: 8 #8
+  batch_size_test: 16 #16
+  epochs: 5 # 60
+  lr: 0.001
+  cache_num: 4 #should to be divisible by 2
+  data_dir: vanessagd/MonaiDatasets/DeepAtlas
+  limit: 1
+
+run:
+  cmd: python3 -u -m deepatlas.main --polyaxon train\
+    --batch-size={{ batch_size_train }} \
+    --test-batch-size={{ batch_size_test }} \
+    --epochs={{ epochs }} \
+    --lr={{ lr }} \
+    --resize={{ resize }}
+    --cache-num={{ cache_num }} \
+    --pretrain-seg \
+    --data-dir={{ data_dir }} \
+    --limit={{ limit }}

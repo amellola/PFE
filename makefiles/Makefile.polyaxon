@@ -1,0 +1,25 @@
+.PHONY: polyaxon/install polyaxon/create polyaxon/init polyaxon/run polyaxon/run_exp
+## install polyaxon-cli
+polyaxon/install:
+	pip install markupsafe==2.0.1 polyaxon-cli==0.6.1
+## setup host and port with `make polyaxon/install host=... port=...`
+polyaxon/config:
+	polyaxon config set --host=$(host) --port $(port)
+## Login to polyaxon with user make `polyaxon/config user=...`
+polyaxon/login:
+	polyaxon login --username $(user)
+## Create polyaxon project | needs name=...
+polyaxon/create:
+	polyaxon project create --name $(name)
+## Init polyaxon project | needs name=...
+polyaxon/init:
+	polyaxon init $(name)
+## Run Experiment specified in polyaxon/polyaxonfile.yaml
+polyaxon/run:
+	polyaxon run -f polyaxon/polyaxonfile.yaml -u -l
+## Start tensorboard for experiment xp=...
+polyaxon/board:
+	polyaxon tensorboard -xp $(xp) start -f tensorboard.yml
+## Stop tensorboard for experiment xp=...
+polyaxon/stop_board:
+	polyaxon tensorboard -xp $(xp) stop

@@ -1,0 +1,73 @@
+version: "3"
+services:
+  # [Optional] if your polyaxon-cluster is running behind a vpn,
+  # this container connects to openvpn (specify config in vpn-config folder)
+  # - if not needed just comment out
+  vpn:
+    image: dperson/openvpn-client:latest
+    container_name: vpn
+    cap_add:
+      - net_admin
+    environment:
+      - Firewall=true
+      - DEFAULT_GATEWAY=false
+      - tun=/dev/net/tun
+      - TZ=Time/Zone
+    network_mode: "host"
+    volumes:
+      - ./vpn-config/:/vpn
+      - /dev/net/tun:/dev/net/tun
+    restart: always
+    labels:
+      autoheal: true
+
+  dev-container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PYTHON_VERSION: 3.8 # tested with 3.8 - 3.10 is known to have issues
+        DISTRO: buster # change to bullseye when on mac
+        WORKSPACE: /monai_seg
+        USERNAME: vscode
+        POLYAXON: 1 # set to false if you don't want to init the polyaxon-cli (if true, config need to be set)
+
+    # [Optional] if you want to run the container in interactive mode uncomment
+    # > docker compose run deepatlas-dev
+    # don't uncomment if you are using the dev-container
+    # === Interactive Mode ===
+    # stdin_open: true
+    # tty: true
+    # ========================
+
+    network_mode: "host"
+    ipc: "host"
+    command: /bin/sh -c "cp -r /poetry-venv/.venv ./; cp /poetry-venv/poetry.lock ./; chown -R vscode:vscode poetry.lock; chown -R vscode:vscode .venv; while sleep 1000; do :; done"
+
+    # You might want to use a graphics card to run:
+    # If you don't have one, comment the following lines
+    # === Graphic Card - Setup ===
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    # ============================
+
+    volumes:
+      - ./:/monai_seg
+      - /mnt/data/leonhard_zirus:/monai_seg/datasets
+      # stops the folders from being mapped to the container
+      - /monai_seg/.venv
+      - /monai_seg/.mypy_cache
+      - /monai_seg/.pytest_cache
+      # ===
+      - ~/.ssh:/home/vscode/.ssh # for private git repos
+      - monai_us_seg-bashhistory:/commandhistory
+volumes:
+  monai_us_seg-bashhistory:

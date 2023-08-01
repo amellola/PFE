@@ -1,0 +1,139 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "2.1.0",
+    "configurations": [
+        {
+            "name": "Train Deepatlas",
+            "program": "/monai_seg/deepatlas/main.py",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "command": "python -m deepatlas.main",
+            "args": [
+                "--debug",
+                "train",
+                "--batch-size=2",
+                "--test-batch-size=2",
+                "--epochs=5",
+                "--lr=0.001",
+                "--resize=128",
+                "--cache-num=2",
+                "--data-dir=/monai_seg/datasets/thyroid_even/imagesTr",
+                "--train-context={\"lambda_a\":2.0,\"lambda_sp\":3.0,\"lambda_r_multiplier\":7.5,\"reg_phase_training_batches_per_epoch\":40,\"seg_phase_training_batches_per_epoch\":5,\"reg_phase_num_validation_batches_to_use\":40,\"val_interval\":5}",
+                "--conf-maps",
+                "--no-pretrain-seg",
+                "--solo-seg",
+                "--network=unet",
+                "--size=380"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": true
+        }, {
+            "name": "Infer UNetr",
+            "program": "/monai_seg/deepatlas/main.py",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "command": "python -m deepatlas.main",
+            "args": [
+                "--debug",
+                "train",
+                "--solo-seg",
+                "--batch-size=2",
+                "--test-batch-size=2",
+                "--epochs=5",
+                "--lr=0.001",
+                "--resize=96",
+                "--cache-num=2",
+                "--data-dir=datasets/cm_loss_test",
+                "--conf-maps",
+                "--network=unet",
+                // -m deepatlas.main --debug train \
+                // --batch-size=2 \
+                // --test-batch-size=2 \
+                // --epochs=10 \
+                // --lr=0.001 \
+                // --resize=128 \
+                // --cache-num=2 \
+                // --data-dir=datasets/cm_loss_test \
+                // --limit=2 \
+                // --network=unet \
+                // --conf-maps \
+                // --solo-seg
+                // "infer",
+                // "--data-dir=/monai_seg/datasets/new_us_data/imagesTs",
+                // "--seg-model=/monai_seg/data/checkpoints/unetr-120-new_data.pth",
+                // "--resize=128",
+                // "--network=unetr",
+                // "--solo-seg",
+                // "--metrics"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": true
+        }, {
+            "name": "Run Command",
+            "program": "/monai_seg/deepatlas/main.py",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "command": "python -m deepatlas.main",
+            "args": [
+                // train --batch-size=32 --test-batch-size=32 --lr=0.001 --cache-num=32 --data-dir=datasets/Colombia/Auricular/ImagesTr --network=unet2d --transformer=2d --num-seg-classes=2 --resize=256 --solo-seg --epochs=120 --loss dice
+                "train",
+                "--batch-size=32",
+                "--test-batch-size=32",
+                "--lr=0.001",
+                "--cache-num=32",
+                "--data-dir=datasets/mediano/imagesTr",
+                // "--data-dir=datasets/Colombia/Auricular/ImagesTr",
+                "--network=unet2d",
+                "--transformer=2d",
+                "--num-seg-classes=2",
+                "--resize=256",
+                "--solo-seg",
+                "--epochs=120",
+                "--loss=dice",
+                "--device=cpu"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": true
+        }, {
+            "name": "Run Infer Command",
+            "program": "/monai_seg/deepatlas/main.py",
+            "type": "python",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "command": "python -m deepatlas.main",
+            "args": [
+                // --debug train --batch-size=10 --test-batch-size=10 --lr=0.001 --cache-num=2 --data-dir=datasets/BP/imagesTr --network=unet2d --transformer=2d --num-seg-classes=2 --resize=128 --solo-seg --epochs=10 --loss dice --device=cpu
+                "--debug",
+                "train",
+                "--batch-size=10",
+                "--test-batch-size=10",
+                "--lr=0.001",
+                "--cache-num=2",
+                "--data-dir=datasets/ciatico/imagesTr",
+                "--network=unet2d",
+                "--transformer=2d",
+                "--num-seg-classes=2",
+                "--resize=128",
+                "--solo-seg",
+                "--epochs=10",
+                "--loss=dice",
+                "--device=cpu"
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "justMyCode": true
+        }
+    ]
+}

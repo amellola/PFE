@@ -1,0 +1,45 @@
+{
+    "editor.formatOnSave": true,
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    },
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.associations": {
+        "Makefile.*": "makefile"
+    },
+
+    "python.defaultInterpreterPath": ".venv/bin/python",
+    "python.formatting.provider": "black",
+    "python.linting.banditEnabled": true,
+    "python.linting.banditArgs": [
+        "--config", ".bandit.yml"
+    ],
+    "python.linting.mypyEnabled": true,
+    "python.linting.prospectorEnabled": true,
+    "python.linting.prospectorArgs": [
+        "--without-tool", "pylint"
+    ],
+    "python.linting.pydocstyleEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.pylintPath": ".venv/bin/pylint",
+    "python.sortImports.args": [
+        "--profile=black", "--src=${workspaceFolder}"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests"],
+    "python.testing.unittestEnabled": false,
+
+    "[makefile]": {
+        "editor.insertSpaces": false,
+        "editor.tabSize": 4,
+        "editor.detectIndentation": true
+    },
+    "logViewer.watch": [
+        {
+            "title": "Network Train",
+            "pattern": "./*.log"
+        },
+    ]
+}

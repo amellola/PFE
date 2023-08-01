@@ -1,0 +1,72 @@
+---
+version: 1
+
+kind: group
+
+framework: pytorch
+
+tags: [new_data, group, unet_r, wandb]
+
+build:
+  image: pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime
+  # nvidia/cuda:11.3.0-cudnn8-runtime-ubuntu20.04
+  # pytorch/pytorch:1.12.1-cuda11.3-cudnn8-runtime # TODO wrong python version
+  # image: pytorch/pytorch:1.9.1-cuda11.1-cudnn8-runtime
+  build_steps:
+    - apt update
+    - apt install gcc python3 python3-pip -y
+    - python3 -m pip install -U --no-cache-dir polyaxon_client
+    - pip install -r requirements.txt
+  env_vars:
+    - ["TORCH_HOME", "/data1/PytorchModelZoo"]
+    - ["CUDA_LAUNCH_BLOCKING", 1]
+
+environment:
+  resources:
+    cpu:
+      requests: 3
+      limits: 3
+    memory:
+      requests: 8192 #16384 #10240 #8192 #4096 #2048
+      limits: 16384 #32768 #24576 #16384 #8192 #4096
+    gpu:
+      requests: 1
+      limits: 1
+
+hptuning:
+  matrix:
+    epochs:
+      values: [60, 120]
+    network:
+      values: ["unet", "unetr"]
+
+params:
+  batch_size_train: 2 #8
+  batch_size_test: 2 #16
+  lr: 0.001
+  resize: 128 #96 #144
+  cache_num: 1
+  # data_dir: vanessagd/Monai_Projects/DeepAtlas/deepatlas_small_preprocessed/imagesTr/
+  # test_data_dir: vanessagd/Monai_Projects/DeepAtlas/deepatlas_small_preprocessed/imagesTs/
+  data_dir: vanessagd/Monai_Projects/Ifssnet/Left/imagesTr
+  test_data_dir: vanessagd/Monai_Projects/Ifssnet/Left/imagesTs
+
+run:
+  cmd:
+    python3 -u -m deepatlas.main \
+    --polyaxon  \
+    --wandb \
+    --wandb-key ebc2a5f87292a5eb270a5a7cd8fc74355c7cd924 \
+    train \
+    --batch-size={{ batch_size_train }} \
+    --test-batch-size={{ batch_size_test }} \
+    --epochs={{ epochs }} \
+    --lr={{ lr }} \
+    --resize={{ resize }} \
+    --cache-num={{ cache_num }} \
+    --data-dir={{ data_dir }} \
+    --network={{ network }} \
+    --solo-seg \
+    # infer \
+    # --data-dir {{ test_data_dir }} \
+    # --save-ram

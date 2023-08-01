@@ -1,0 +1,11 @@
+old/run_local:
+	python -m deepatlas.run --batch-size 2 --test-batch-size 4 --epochs 5 --lr 1e-3 --no-polyaxon --tutorial
+
+old/run_checkpoints:
+	python -m deepatlas.run --no-polyaxon --tutorial
+
+old/run_local_us:
+	python -m deepatlas.run --batch-size 1 --test-batch-size 1 --epochs 5 --lr 1e-3 --no-polyaxon --resize 48
+
+old/run_polyaxon:
+	python -m deepatlas.run --batch-size 8 --test-batch-size 16 --epochs 60 --lr 1e-3

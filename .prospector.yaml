@@ -1,0 +1,28 @@
+
+test-warnings: true
+doc-warnings: true
+
+bandit:
+  run: true
+  options:
+    config: .bandit.yml
+
+mypy:
+  run: true
+
+pydocstyle:
+  disable:
+    - D203
+    - D212
+    - D213
+    - D214
+    - D215
+    - D404
+    - D406
+    - D407
+    - D408
+    - D409
+    - D413
+    - D415
+    - D416
+    - D417
